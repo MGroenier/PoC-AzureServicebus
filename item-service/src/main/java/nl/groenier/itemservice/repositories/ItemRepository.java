@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface ItemRepository extends MongoRepository<Item, String> {
 
-	public List<Item> findByTargetCity(String targetCity);
-	public List<Item> findAll();
-	public long count();
+	List<Item> findByTargetCity(String targetCity);
+	List<Item> findAll();
+	long count();
 
 }
