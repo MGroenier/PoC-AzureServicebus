@@ -1,16 +1,12 @@
-package nl.groenier.itemservice.service_bus;
+package nl.groenier.tracklogservice.service_bus;
 
 import com.microsoft.azure.servicebus.*;
-import com.microsoft.azure.servicebus.QueueClient;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
-import nl.groenier.itemservice.models.Item;
-import nl.groenier.trackingsystem.MessageBodyConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 public class Consumer {
@@ -23,25 +19,21 @@ public class Consumer {
 	public void receiveQueueMessage() throws ServiceBusException, InterruptedException {
 		queueClient.registerMessageHandler(new MessageHandler(), new MessageHandlerOptions());
 
-		TimeUnit.SECONDS.sleep(5);
-		queueClient.close();
+//		TimeUnit.SECONDS.sleep(5);
+//		queueClient.close();
 	}
 
 	public void receiveTopicMessage() throws ServiceBusException, InterruptedException {
 		subscriptionClient.registerMessageHandler(new MessageHandler(), new MessageHandlerOptions());
 
-		TimeUnit.SECONDS.sleep(5);
-		subscriptionClient.close();
+//		TimeUnit.SECONDS.sleep(5);
+//		subscriptionClient.close();
 	}
 
 	static class MessageHandler implements IMessageHandler {
 		public CompletableFuture<Void> onMessageAsync(IMessage message) {
 			final String messageString = new String(message.getBody(), StandardCharsets.UTF_8);
-
-			// Deserialization
-			Item anObject = MessageBodyConverter.deserialize(messageString, Item.class);
-
-			System.out.println("Received message: " + anObject.toString());
+			System.out.println("Received message: " + messageString);
 			return CompletableFuture.completedFuture(null);
 		}
 

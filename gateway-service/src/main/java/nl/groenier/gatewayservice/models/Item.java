@@ -1,17 +1,16 @@
-package nl.groenier.itemservice.models;
+package nl.groenier.gatewayservice.models;
 
-import javax.persistence.*;
-
-@Entity
 public class Item {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long id;
 
 	private String description;
 
 	private double weight;
+
+	private Location origin_location;
+
+	private Location destination_location;
 
 	public Item() {
 	}
@@ -22,12 +21,6 @@ public class Item {
 		this.origin_location = origin_location;
 		this.destination_location = destination_location;
 	}
-
-	@ManyToOne
-	private Location origin_location;
-
-	@ManyToOne
-	private Location destination_location;
 
 	public long getId() {
 		return id;
