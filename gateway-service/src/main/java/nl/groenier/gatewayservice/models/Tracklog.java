@@ -4,6 +4,7 @@ public class Tracklog {
 
 	private long id;
 
+	private Item item;
 	private long item_id;
 
 	private Location location;

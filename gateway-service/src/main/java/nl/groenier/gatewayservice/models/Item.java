@@ -8,18 +8,18 @@ public class Item {
 
 	private double weight;
 
-	private Location origin_location;
+	private long origin_location_id;
 
-	private Location destination_location;
+	private long destination_location_id;
 
 	public Item() {
 	}
 
-	public Item(String description, double weight, Location origin_location, Location destination_location) {
+	public Item(String description, double weight, long destination_location, long destination_location_id) {
 		this.description = description;
 		this.weight = weight;
-		this.origin_location = origin_location;
-		this.destination_location = destination_location;
+		this.origin_location_id = origin_location_id;
+		this.destination_location_id = destination_location_id;
 	}
 
 	public long getId() {
@@ -46,20 +46,20 @@ public class Item {
 		this.weight = weight;
 	}
 
-	public Location getOrigin_location() {
-		return origin_location;
+	public long getOrigin_location_id() {
+		return origin_location_id;
 	}
 
-	public void setOrigin_location(Location origin_location) {
-		this.origin_location = origin_location;
+	public void setOrigin_location_id(long origin_location_id) {
+		this.origin_location_id = origin_location_id;
 	}
 
-	public Location getDestination_location() {
-		return destination_location;
+	public long getDestination_location_id() {
+		return destination_location_id;
 	}
 
-	public void setDestination_location(Location destination_location) {
-		this.destination_location = destination_location;
+	public void setDestination_location_id(long destination_location_id) {
+		this.destination_location_id = destination_location_id;
 	}
 
 	@Override
@@ -68,8 +68,8 @@ public class Item {
 				"id=" + id +
 				", description='" + description + '\'' +
 				", weight=" + weight +
-				", origin_location=" + origin_location +
-				", destination_location=" + destination_location +
+				", origin_location_id=" + origin_location_id +
+				", destination_location_id=" + destination_location_id +
 				'}';
 	}
 }

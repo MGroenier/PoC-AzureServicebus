@@ -32,10 +32,10 @@ public class ItemServiceController {
 //		producer.sendQueueMessage(item);
 	}
 
-	@GetMapping(value = "/consume-queue")
-	public void consumeMessageFromQueue() throws ServiceBusException, InterruptedException {
-		consumer.receiveQueueMessage();
-	}
+//	@GetMapping(value = "/consume-queue")
+//	public void consumeMessageFromQueue() throws ServiceBusException, InterruptedException {
+//		consumer.receiveQueueMessage();
+//	}
 
 	@PostMapping(value = "/produce-topic")
 	public void sendMessageToTopic(@RequestParam("message") String message) throws ServiceBusException, InterruptedException {

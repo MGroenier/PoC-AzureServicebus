@@ -28,8 +28,10 @@ public class Producer {
 
 	public void sendTopicMessage(String messageBody) throws ServiceBusException, InterruptedException {
 		System.out.println("Sending message to topic: " + messageBody);
-		final Message message = new Message(messageBody.getBytes(StandardCharsets.UTF_8));
-		topicClient.send(message);
+		Message message = new Message(messageBody.getBytes(StandardCharsets.UTF_8));
+		topicClient.sendAsync(message);
+//		topicClient.closeAsync();
+//		topicClient.send(message);
 //		topicClient.close();
 	}
 
