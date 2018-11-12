@@ -29,6 +29,7 @@ public class Producer {
 	public void sendTopicMessage(String messageBody) throws ServiceBusException, InterruptedException {
 		System.out.println("Sending message to topic: " + messageBody);
 		Message message = new Message(messageBody.getBytes(StandardCharsets.UTF_8));
+		message.setLabel("create user");
 		topicClient.sendAsync(message);
 //		topicClient.closeAsync();
 //		topicClient.send(message);

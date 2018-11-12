@@ -31,9 +31,6 @@ public class Consumer {
 
 	public void receiveTopicMessage() throws ServiceBusException, InterruptedException {
 		subscriptionClient.registerMessageHandler(new MessageHandler(), new MessageHandlerOptions());
-
-		TimeUnit.SECONDS.sleep(5);
-		subscriptionClient.close();
 	}
 
 	static class MessageHandler implements IMessageHandler {
@@ -45,6 +42,7 @@ public class Consumer {
 			final String messageString = new String(message.getBody(), StandardCharsets.UTF_8);
 
 			if(message.getLabel() == "create user") {
+				System.out.println("received message with CREATE USER label.");
 				Item anObject = MessageBodyConverter.deserialize(messageString, Item.class);
 				itemRepository.save(anObject);
 			}
