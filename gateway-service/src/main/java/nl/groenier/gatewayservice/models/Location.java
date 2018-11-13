@@ -15,7 +15,8 @@ public class Location {
 	public Location() {
 	}
 
-	public Location(String city, String street, Integer streetnumber, String suffix, String postal_code, String country_code, double longitude, double latitude) {
+	public Location(long id, String city, String street, Integer streetnumber, String suffix, String postal_code, String country_code, double longitude, double latitude) {
+		this.id = id;
 		this.city = city;
 		this.street = street;
 		this.streetnumber = streetnumber;

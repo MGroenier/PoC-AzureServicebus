@@ -5,7 +5,9 @@ import com.microsoft.azure.servicebus.QueueClient;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import nl.groenier.itemservice.models.Item;
+import nl.groenier.itemservice.models.Location;
 import nl.groenier.itemservice.repositories.ItemRepository;
+import nl.groenier.itemservice.repositories.LocationRepository;
 import nl.groenier.trackingsystem.MessageBodyConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,6 +17,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,86 +30,56 @@ public class Consumer {
 	private SubscriptionClient subscriptionClient;
 
 	private String connectionString = "Endpoint=sb://tracking-system.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=l3W7sB4oWl9ct6JPNfE1QUkBQCQSIclgZzw+ScxJWkQ=";
+	private String enityPath = "item-service-topic/subscriptions/test-topic-subscription";
 
+	@Autowired
+	private ItemRepository itemRepository;
+
+	@Autowired
+	private LocationRepository locationRepository;
 
 
 	public Consumer() throws Exception {
-		subscriptionClient = new SubscriptionClient(new ConnectionStringBuilder(connectionString, "item-service-topic/subscriptions/test-topic-subscription"), ReceiveMode.PEEKLOCK);
-//		ExecutorService executorService = Executors.newCachedThreadPool();
-//		registerMessageHandlerOnClient(subscriptionClient, executorService);
-		subscriptionClient.registerMessageHandler(new MessageHandler(), new MessageHandlerOptions());
+		subscriptionClient = new SubscriptionClient(new ConnectionStringBuilder(connectionString, enityPath), ReceiveMode.PEEKLOCK);
+		ExecutorService executorService = Executors.newCachedThreadPool();
+		registerMessageHandlerOnClient(subscriptionClient, executorService);
 	}
 
-	private class MessageHandler implements IMessageHandler {
+	void registerMessageHandlerOnClient(SubscriptionClient receiveClient, ExecutorService executorService) throws Exception {
 
-		@Autowired
-		private ItemRepository itemRepository;
+		receiveClient.registerMessageHandler(new IMessageHandler() {
+			@Override
+			public CompletableFuture<Void> onMessageAsync(IMessage message) {
 
-		public CompletableFuture<Void> onMessageAsync(IMessage message) {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Date date = new Date();
+				String messageString = new String(message.getBody(), StandardCharsets.UTF_8);
+				Item receivedItem = MessageBodyConverter.deserialize(messageString, Item.class);
 
-			final String messageString = new String(message.getBody(), StandardCharsets.UTF_8);
+				switch (message.getLabel()) {
+					case "item-create":
+						itemRepository.save(receivedItem);
+						break;
+					case "item-update":
+						itemRepository.save(receivedItem);
+						break;
+					case "item-delete":
+						itemRepository.delete(receivedItem);
+						break;
+					case "item-read":
+						//TODO How to implement this? How do we return the result to the client that performed the request.
+						System.out.println("Read Item!");
+						break;
+				}
 
-			if(message.getLabel() == "create user") {
-				System.out.println("received message with CREATE USER label.");
-				Item anObject = MessageBodyConverter.deserialize(messageString, Item.class);
-				itemRepository.save(anObject);
+				return receiveClient.completeAsync(message.getLockToken());
 			}
-			// Deserialization
-			Item anObject = MessageBodyConverter.deserialize(messageString, Item.class);
 
-			System.out.println(dateFormat.format(date) + " --- Received message: " + anObject.toString());
-			return CompletableFuture.completedFuture(null);
-		}
+			@Override
+			public void notifyException(Throwable throwable, ExceptionPhase exceptionPhase) {
+				System.out.println("notify exception!");
+			}
+		});
 
-		public void notifyException(Throwable exception, ExceptionPhase phase) {
-			System.out.println(phase + " encountered exception:" + exception.getMessage());
-		}
 	}
-
-//	void registerMessageHandlerOnClient(SubscriptionClient receiveClient, ExecutorService executorService) throws Exception {
-//
-//		// register the RegisterMessageHandler callback
-//		receiveClient.registerMessageHandler(
-//				new IMessageHandler() {
-//					// callback invoked when the message handler loop has obtained a message
-//					public CompletableFuture<Void> onMessageAsync(IMessage message) {
-//						// receives message is passed to callback
-//						if (message.getLabel() != null &&
-//								message.getContentType() != null &&
-//								message.getLabel().contentEquals("Scientist") &&
-//								message.getContentType().contentEquals("application/json")) {
-//
-////							byte[] body = message.getBody();
-////							Map scientist = GSON.fromJson(new String(body, UTF_8), Map.class);
-////
-////							System.out.printf(
-////									"\n\t\t\t\t%s Message received: \n\t\t\t\t\t\tMessageId = %s, \n\t\t\t\t\t\tSequenceNumber = %s, \n\t\t\t\t\t\tEnqueuedTimeUtc = %s," +
-////											"\n\t\t\t\t\t\tExpiresAtUtc = %s, \n\t\t\t\t\t\tContentType = \"%s\",  \n\t\t\t\t\t\tContent: [ firstName = %s, name = %s ]\n",
-////									receiveClient.getEntityPath(),
-////									message.getMessageId(),
-////									message.getSequenceNumber(),
-////									message.getEnqueuedTimeUtc(),
-////									message.getExpiresAtUtc(),
-////									message.getContentType(),
-////									scientist != null ? scientist.get("firstName") : "",
-////									scientist != null ? scientist.get("name") : "");
-//							System.out.println("hoi");
-//						}
-//						return receiveClient.completeAsync(message.getLockToken());
-//					}
-//
-//					// callback invoked when the message handler has an exception to report
-//					public void notifyException(Throwable throwable, ExceptionPhase exceptionPhase) {
-//						System.out.printf(exceptionPhase + "-" + throwable.getMessage());
-//					}
-//				},
-//				// 1 concurrent call, messages are auto-completed, auto-renew duration
-//				new MessageHandlerOptions(1, false, Duration.ofMinutes(1)),
-//				executorService);
-//
-//	}
 
 
 }
