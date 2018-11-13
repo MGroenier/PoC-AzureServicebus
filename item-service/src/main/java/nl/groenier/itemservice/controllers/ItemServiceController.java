@@ -41,12 +41,6 @@ public class ItemServiceController {
 	public void sendMessageToTopic(@RequestParam("message") String message) throws ServiceBusException, InterruptedException {
 		producer.sendTopicMessage(message);
 	}
-
-	@GetMapping(value = "/consume-topic")
-	public void consumeMessageFromTopic() throws ServiceBusException, InterruptedException {
-		consumer.receiveTopicMessage();
-	}
-
 	@GetMapping(value = "/reset-repository")
 	public void resetRepository() {
 		//delete all records of the database
