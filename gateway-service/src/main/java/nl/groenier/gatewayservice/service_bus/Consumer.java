@@ -18,7 +18,6 @@ public class Consumer {
 
 	public void receiveQueueMessage() throws ServiceBusException, InterruptedException {
 		queueClient.registerMessageHandler(new MessageHandler(), new MessageHandlerOptions());
-
 //		TimeUnit.SECONDS.sleep(5);
 //		queueClient.close();
 	}

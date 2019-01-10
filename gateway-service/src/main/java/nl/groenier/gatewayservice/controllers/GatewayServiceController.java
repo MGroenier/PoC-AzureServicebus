@@ -40,6 +40,7 @@ public class GatewayServiceController {
 	@PutMapping(value = "/items")
 	public void createItem(@RequestBody Item item) throws ServiceBusException, InterruptedException {
 		producer.sendTopicMessage(MessageBodyConverter.serialize(item), "item-create");
+
 	}
 
 	@PostMapping(value = "/items")
